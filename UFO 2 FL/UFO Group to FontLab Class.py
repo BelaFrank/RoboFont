@@ -25,16 +25,14 @@ def print_flc_file():
                 glyphs = [ x for x in f.groups[i]] 
         
                 if i[0] == '@':
-                    glyphs[0] = glyphs[0] + '\'' # make first glyph a key glyph if kerning class
-                    # however it may not be the one you want it to be. RoboFont seems to re-sort
-                    # the glyphs in groups alphabetcally — you better check it before or after export.
+                    glyphs[0] = glyphs[0] + '\'' # make first glyph a key glyph if kerning class.
         
                 glyphs = ' '.join(glyphs)
                 
                 temp += '%s\n' %glyphs
         
-                is_left = 'MMK_L' in i or 'KERN_LEFT' in i
-                is_right = 'MMK_R' in i or 'KERN_RIGHT' in i                
+                is_left = 'MMK_L' in i or 'KERN_LEFT' in i or 'public.kern1.' in i
+                is_right = 'MMK_R' in i or 'KERN_RIGHT' in i or 'public.kern2.' in i                
         
                 if is_left:
                     temp += '%%KERNING L 0\n'
