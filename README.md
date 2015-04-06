@@ -14,5 +14,5 @@ TODO:
 
 - code clean-up as it is a mess now
 
-- update with UFO3 style group naming sceme detection. Not that I expect many people to convert from UFO to .vfb in the future.
+- update with UFO3 style group naming scheme detection (not that I expect many people to convert from UFO to .vfb in the future).
 
