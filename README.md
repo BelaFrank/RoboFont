@@ -9,4 +9,4 @@ NOTE that for kerning classes it looks for the MetricsMachine-like '@MMK_L_...' 
     
 All other groups will be written as OpenType classes.
 
-Note: the script marks the first glyph in a group as the key glyph of the FL kerning class. However it may not be the one you want it to be. RoboFont seems to sort the glyphs in groups alphabetically and so you can end up with a key glyph you didn't want. The ordering can be changed manually.
+Note: it's a good idea to check the FL kerning class key glyphs in your file.
