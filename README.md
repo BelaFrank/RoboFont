@@ -1,8 +1,7 @@
 # RoboFont-scripts
 A selection of really simple RoboFont scripts
 
-UFO Groups to FontLab Class
-===========================
+##UFO Groups to FontLab Class
 
 This makeshift, simple script writes an .flc file next to your UFO. It takes care of the key glyph marking in kerning groups. 
     
