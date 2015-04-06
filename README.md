@@ -1,5 +1,5 @@
 # RoboFont-scripts
-RoboFont scripts
+A selection of really simple RoboFont scripts
 
 UFO Groups to FontLab Class
 ===========================
