@@ -3,19 +3,7 @@
 
 def print_flc_file():
     '''
-    This script write an .flc file based on the groups in CurrentFont.
-    
-    NOTE that for kerning classes it looks for the MetricsMachine-like
-    '@MMK_L_...' and '@MMK_R_...' groups names eg it expects your ufo groups 
-    set up in MetricsMachine or in the same manner
-    
-    OR
-    
-    it looks for 'KERN_LEFT_...' and 'KERN_RIGHT_...' groups names (this is
-    useful when you open up a binary font with kerning in RoboFont.
-    
-    All other groups will be written as OpenType classes.
-    
+    This script write an .flc file based on the groups in CurrentFont.    
     '''
 
     if CurrentFont():
@@ -28,35 +16,34 @@ def print_flc_file():
         for i in groups:
             if f.groups[i]:
                 if i[0] == '@':
-                    fl_class_name = i.replace('@', '_')
+                    fl_class_name = i.replace('@', '_') # FL kern class name must start with underscore
                 else:
                     fl_class_name = i
                 
-                temp += '%%CLASS %s\n' %fl_class_name
-                temp += '%%GLYPHS '
+                temp += '%%CLASS %s\n%%GLYPHS ' %fl_class_name
         
                 glyphs = [ x for x in f.groups[i]] 
         
                 if i[0] == '@':
-                    glyphs[0] = glyphs[0] + '\''
-                else:
-                    pass
+                    glyphs[0] = glyphs[0] + '\'' # make first glyph a key glyph if kerning class
+                    # however it may not be the one you want it to be — you better check it
         
-                glyphs_str = ''
-                x = 0
-                for n in range(0, len(glyphs)):
-                    glyphs_str += glyphs[n] + ' '
-                    x += 1
+                glyphs = ' '.join(glyphs)
                 
-                temp += '%s\n' %glyphs_str 
+                temp += '%s\n' %glyphs
         
-                if 'MMK_L' in i or 'KERN_LEFT' in i:
+                is_left = 'MMK_L' in i or 'KERN_LEFT' in i
+                is_right = 'MMK_R' in i or 'KERN_RIGHT' in i                
+        
+                if is_left:
                     temp += '%%KERNING L 0\n'
-                elif 'MMK_R' or 'KERN_RIGHT' in i:
+                    
+                if is_right:
                     temp += '%%KERNING R 0\n'
+                    
                 else:
                     pass
-        
+                            
                 temp += '%%END\n\n'
         
         # Write it to an .flc file    
@@ -66,7 +53,7 @@ def print_flc_file():
         f.write(temp)
         f.close()
         
-        print 'An .flc file was written next to your UFO.'
+        print 'An .flc file with %i classes was written next to your UFO.' %len(groups)
         
         
         # test block below
