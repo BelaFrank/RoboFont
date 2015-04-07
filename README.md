@@ -1,5 +1,7 @@
 # RoboFont-scripts
-A selection of really simple RoboFont scripts
+A selection of really simple .py / RoboFont / DrawBot scripts that I wrote / use / try and improve when I can. 
+
+Feel free to use or modify any of them. They are tailored after my needs and there's no guarantee they work as you wish or at all. Always use with copies. 
 
 ##UFO Groups to FontLab Class
 
