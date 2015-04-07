@@ -18,3 +18,8 @@ NOTE that for kerning classes it looks for:
 All other groups will be written as OpenType classes.
 
 Note: it's always a good idea to check the FL kerning class key glyphs in generated file.
+
+
+#Feedback/Suggestions
+
+Issues and pull requests very much appreciated.
