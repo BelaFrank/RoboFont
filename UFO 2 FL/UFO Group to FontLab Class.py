@@ -7,42 +7,38 @@ class GroupToClass(object):
     
     def __init__(self):
         self.writeAsIs = False
-        self.tryToFix = True
+        self.reorder = True
         self.w = FloatingWindow(    (-260, 100, 200, 90), 
                                     title = 'UFO Group to FL Class'    )
         self.w.button_save_to_flc = SquareButton(
-                                    (10,10, -10, 20),
+                                    (10,10, -10, 30),
                                     title = 'Save to .flc File',
                                     sizeStyle = 'small',
                                     callback = self.generate_flc_file    )
-        self.w.line = HorizontalLine(    (0, 30, -0, 30)    )
-        self.w.writeAsIs = CheckBox(    (10, 56, 100, 20), 
+        self.w.line = HorizontalLine(    (0, 40, -0, 30)    )
+        self.w.writeAsIs = CheckBox(    (10, 61, 100, 20), 
                                         title = 'Write as is',
                                         callback=self.writeAsIsCallback,
                                         sizeStyle = 'small',
                                         value=self.writeAsIs    )
-        self.w.tryToFix = CheckBox(    (100, 56, 100, 20),
-                                        title = 'Try to fix',
-                                        callback=self.tryToFixCallback,
+        self.w.reorder = CheckBox(    (100, 61, 100, 20),
+                                        title = 'Re-order',
+                                        callback=self.reorderCallback,
                                         sizeStyle = 'small',
-                                        value=self.tryToFix    )
+                                        value=self.reorder    )
         
         self.w.open()
         
     def writeAsIsCallback(self, sender):
-        self.w.tryToFix.set(False)
-        self.writeAsIs = True
-        self.tryToFix = False
-        print 'writeAsIs', self.writeAsIs
-        print 'tryToFix\n', self.tryToFix
+        self.w.reorder.set(False)
+        self.writeAsIs = True 
+        self.reorder = False
+
        
-    def tryToFixCallback(self, sender):
+    def reorderCallback(self, sender):
         self.w.writeAsIs.set(False)
         self.writeAsIs = False
-        self.tryToFix = True
-        print 'writeAsIs', self.writeAsIs
-        print 'tryToFix\n', self.tryToFix
-    
+        self.reorder = True
     
                 
     def generate_flc_file(self, sender):
@@ -51,7 +47,13 @@ class GroupToClass(object):
         '''
         
         
-        if CurrentFont():
+        if not CurrentFont():
+            print 'Open a UFO first.'
+        
+        elif CurrentFont() and not CurrentFont().path:
+            print 'Save the UFO first.'
+        
+        elif CurrentFont() and CurrentFont().path:
             f = CurrentFont()
             fontname = f.info.familyName + ' ' + f.info.styleName
             groups = sorted(f.groups.keys())
@@ -72,7 +74,7 @@ class GroupToClass(object):
                         
                     if i[0] == '@':
                         # TRY TO FIX WAY
-                        if self.tryToFix == True:
+                        if self.reorder == True:
                             key_should_be = ''
                             kerning_class_mark = [    'MMK_L_', 'KERN_LEFT_', 'public.kern1.', 
                                                     'MMK_R_', 'KERN_RIGHT_', 'public.kern2.']
@@ -112,14 +114,12 @@ class GroupToClass(object):
             f.write(temp)
             f.close()
     
-            return 'An .flc file with %i classes was written next to your UFO.' %len(groups)
+            print 'An .flc file with %i classes was written next to your UFO.' %len(groups)
 
         
         
-        else:
-            return 'Open a UFO first'
 
-        
+
 
         
 
