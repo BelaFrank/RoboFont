@@ -18,7 +18,9 @@ NOTE that for kerning classes it looks for:
     
 All other groups will be written as OpenType classes.
 
-Note: it's always a good idea to check the FL kerning class key glyphs in generated file.
+There are options now—by default, it tries to mark the proper glyph based on group name as kerning class key glyph ('Reorder'). You can make it to convert the groups as they are and mark the first glyph as key selecting the 'Write as is' option.
+
+It's always a good idea to check the FL kerning class key glyphs in generated file.
 
 
 #Feedback/Suggestions
