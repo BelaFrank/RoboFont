@@ -67,7 +67,8 @@ class GroupToClass(object):
                     else:
                         fl_class_name = i
             
-                    temp += '%%CLASS %s\n%%GLYPHS ' %fl_class_name
+                    temp += '%%CLASS ' + fl_class_name
+                    temp += '\n%%GLYPHS '
     
                     glyphs = [ x for x in f.groups[i]] 
                         
