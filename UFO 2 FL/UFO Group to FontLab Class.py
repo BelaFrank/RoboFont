@@ -1,127 +1,140 @@
 
 from  vanilla import *
-    
-    
-    
+
+url = ''
+
 class GroupToClass(object): 
     
     def __init__(self):
+        self.f = ''
         self.writeAsIs = False
         self.reorder = True
-        self.w = FloatingWindow(    (-260, 100, 200, 90), 
+        self.rename = False
+        self.w = FloatingWindow(    (-260, 100, 220, 90), 
                                     title = 'UFO Group to FL Class'    )
         self.w.button_save_to_flc = SquareButton(
                                     (10,10, -10, 30),
-                                    title = 'Save to .flc File',
+                                    title = 'Save to .flc file',
                                     sizeStyle = 'small',
-                                    callback = self.generate_flc_file    )
-        self.w.line = HorizontalLine(    (0, 40, -0, 30)    )
+                                    callback = self.main    )
+        self.w.line1 = HorizontalLine((0, 40, -0, 30))
         self.w.writeAsIs = CheckBox(    (10, 61, 100, 20), 
-                                        title = 'Write as is',
-                                        callback=self.writeAsIsCallback,
+                                        title = 'As is',
+                                        callback=self.swap,
                                         sizeStyle = 'small',
                                         value=self.writeAsIs    )
-        self.w.reorder = CheckBox(    (100, 61, 100, 20),
-                                        title = 'Re-order',
-                                        callback=self.reorderCallback,
+        self.w.reorder = CheckBox(    (70, 61, 100, 20),
+                                        title = 'Reorder',
+                                        callback=self.swap,
                                         sizeStyle = 'small',
                                         value=self.reorder    )
-        
+        self.w.rename = CheckBox(    (148, 61, 100, 20),
+                                        title = 'Rename',
+                                        callback=self.renameCallback,
+                                        sizeStyle = 'small',
+                                        value=self.rename    )
         self.w.open()
         
-    def writeAsIsCallback(self, sender):
-        self.w.reorder.set(False)
-        self.writeAsIs = True 
-        self.reorder = False
 
-       
-    def reorderCallback(self, sender):
-        self.w.writeAsIs.set(False)
-        self.writeAsIs = False
-        self.reorder = True
     
+    def swap(self, sender):
+        if self.writeAsIs == False:
+            self.writeAsIs = True
+            self.w.writeAsIs.set(True)
+            
+            self.reorder = False
+            self.w.reorder.set(False)
+        else:
+            self.writeAsIs = False
+            self.w.writeAsIs.set(False)
+            
+            self.reorder = True
+            self.w.reorder.set(True)
+              
+              
+    def renameCallback(self, sender):
+        if self.rename == False:
+            self.rename = True
+        else: 
+            self.rename = False
+
+
+    def generate_flc_file(self):       
+        f = self.f   
+        fontname = f.info.familyName + ' ' + f.info.styleName
+        groups = sorted(f.groups.keys())
+
+        leftMark = ['@MMK_L_', '@KERN_LEFT_'] #'public.kern1.'
+        rightMark = [ '@MMK_R_', '@KERN_RIGHT_'] #'public.kern2.'
+        
+        temp = '%%FONTLAB CLASSES\n\n'
+        
+
+        for i in groups:
+            if f.groups[i]:
+                isLeft = False
+                isRight = False
                 
-    def generate_flc_file(self, sender):
-        '''
-        This script write an .flc file based on the groups in CurrentFont.    
-        '''
+                fl_class_name = i
+                                                
+                for j in leftMark:
+                    if j in i:
+                        isLeft = True
+                        nameKey = i.replace(j, '')
+                        if self.rename == True:
+                            fl_class_name = i.replace(j, '_') + '_1ST'
+                        else:
+                            fl_class_name = i.replace('@', '_')
+                        
+                for j in rightMark:
+                    if j in i:
+                        isRight = True
+                        nameKey = i.replace(j, '')
+                        if self.rename == True:
+                            fl_class_name = i.replace(j, '_') + '_2ND'
+                        else:
+                            fl_class_name = i.replace('@', '_')
+                
+                
+                temp += '%%CLASS ' + fl_class_name
+                temp += '\n%%GLYPHS '
+
+                glyphs = [ x for x in f.groups[i]]
+                
+                if self.reorder == True and (isLeft == True or isRight == True):
+                    if nameKey in glyphs:
+                        pos = glyphs.index(nameKey)
+                        glyphs[0], glyphs[pos] =  glyphs[pos], glyphs[0]
+                                   
+                glyphs = ' '.join(glyphs)
+                temp += '%s\n' %glyphs
+                temp += '%%END\n\n'
+                
+                
+        # Write it to an .flc file    
+        flc_path = (f.path).replace('.ufo', '.flc')        
+        f = open(flc_path, 'w')
+        f.write(temp)
+        f.close()
+
+        print 'An .flc file with %i classes was written next to your UFO.' %len(groups)
         
+                                              
+    def main(self, sender):
         
-        if not CurrentFont():
-            print 'Open a UFO first.'
+        if url and not CurrentFont():
+            self.f = OpenFont(url, showUI=False)
+            self.generate_flc_file()
+            
+        elif CurrentFont() and CurrentFont().path:
+            self.f = CurrentFont()
+            self.generate_flc_file()
         
         elif CurrentFont() and not CurrentFont().path:
             print 'Save the UFO first.'
         
-        elif CurrentFont() and CurrentFont().path:
-            f = CurrentFont()
-            fontname = f.info.familyName + ' ' + f.info.styleName
-            groups = sorted(f.groups.keys())
-
-            temp = '%%FONTLAB CLASSES\n'
-
-            for i in groups:
-                if f.groups[i]:
-                    if i[0] == '@':
-                        fl_class_name = i.replace('@', '_') # FL kern class name must start with underscore
-                    else:
-                        fl_class_name = i
-            
-                    temp += '%%CLASS ' + fl_class_name
-                    temp += '\n%%GLYPHS '
-    
-                    glyphs = [ x for x in f.groups[i]] 
-                        
-                        
-                    if i[0] == '@':
-                        # TRY TO FIX WAY
-                        if self.reorder == True:
-                            key_should_be = ''
-                            kerning_class_mark = [    'MMK_L_', 'KERN_LEFT_', 'public.kern1.', 
-                                                    'MMK_R_', 'KERN_RIGHT_', 'public.kern2.']
-                            for mark in kerning_class_mark:
-                                if mark in i:
-                                    key_should_be = i.split(mark)[1]
-                                    #temp += key_should_be
-                                if key_should_be in glyphs:
-                                    pos = glyphs.index(key_should_be)
-                                    glyphs[0], glyphs[pos] =  glyphs[pos], glyphs[0]
-                
-                
-                    glyphs[0] = glyphs[0] + '\'' # make first glyph a key glyph if kerning class.
-    
-                    glyphs = ' '.join(glyphs)
-            
-                    temp += '%s\n' %glyphs
-    
-                    is_left = 'MMK_L' in i or 'KERN_LEFT' in i or 'public.kern1.' in i
-                    is_right = 'MMK_R' in i or 'KERN_RIGHT' in i or 'public.kern2.' in i                
-    
-                    if is_left:
-                        temp += '%%KERNING L 0\n'
-                
-                    if is_right:
-                        temp += '%%KERNING R 0\n'
-                
-                    else:
-                        pass
-                        
-                    temp += '%%END\n\n'
-    
-            # Write it to an .flc file    
-            flc_path = (CurrentFont().path).replace('ufo', 'flc')
-
-            f = open(flc_path, 'w')
-            f.write(temp)
-            f.close()
-    
-            print 'An .flc file with %i classes was written next to your UFO.' %len(groups)
-
+        elif not CurrentFont():
+            print 'Open a UFO or give me a path.'
         
         
-
-
-
-        
-
 GroupToClass()
